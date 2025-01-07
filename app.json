@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "NewsBlitzs",
+    "slug": "NewsBlitzs",
+    "version": "1.0.0",
+    "newArchEnabled": true,
+    "scheme": "NewsBlitzs",
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true,
+      "tsconfigPaths": true
+    },
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF",
+      "dark": {
+        "backgroundColor": "#1F2937"
+      },
+      "forest": {
+        "backgroundColor": "#E7F0E7"
+      },
+      "night": {
+        "backgroundColor": "#1A1B2E"
+      },
+      "sepia": {
+        "backgroundColor": "#F7E5D4"
+      }
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.reelary.NewsBlitzs"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.reelary.NewsBlitzs",
+      "icon": "./assets/icon.png"
+    }
+  }
+}
