@@ -145,8 +145,7 @@ web-build/
 # Production keys and certificates
 *.keystore
 !debug.keystore
-google-services.json
-GoogleService-Info.plist
+
 
 # Generated files
 ios/Pods/
