@@ -7,6 +7,7 @@ import { StatusBar } from 'react-native';
 import { MotiView } from 'moti';
 import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import { View } from 'react-native';
+import { NotificationsProvider } from '@/context/NotificationsContext';
 
 const toastConfig = {
   success: (props: ToastProps) => (
@@ -63,23 +64,25 @@ export default function Layout() {
 
   return (
     <ThemeProvider>
-      <BookmarksProvider>
-        <View style={{ flex: 1, backgroundColor: theme.bgColor }}>
-          <StatusBar barStyle="light-content" backgroundColor="#000000" translucent={false} />
-          <Stack
-            screenOptions={{
-              headerShown: true,
-              headerBackButtonDisplayMode: 'minimal',
-              headerShadowVisible: false,
-              contentStyle: { backgroundColor: theme.bgColor },
-            }}>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="bookmarks" options={{ title: 'Bookmarks' }} />
-            <Stack.Screen name="article/[id]" options={{ headerShown: false }} />
-          </Stack>
-          <Toast config={toastConfig} position="top" visibilityTime={2000} topOffset={40} />
-        </View>
-      </BookmarksProvider>
+      <NotificationsProvider>
+        <BookmarksProvider>
+          <View style={{ flex: 1, backgroundColor: theme.bgColor }}>
+            <StatusBar barStyle="light-content" backgroundColor="#000000" translucent={false} />
+            <Stack
+              screenOptions={{
+                headerShown: true,
+                headerBackButtonDisplayMode: 'minimal',
+                headerShadowVisible: false,
+                contentStyle: { backgroundColor: theme.bgColor },
+              }}>
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="bookmarks" options={{ title: 'Bookmarks' }} />
+              <Stack.Screen name="article/[id]" options={{ headerShown: false }} />
+            </Stack>
+            <Toast config={toastConfig} position="top" visibilityTime={2000} topOffset={40} />
+          </View>
+        </BookmarksProvider>
+      </NotificationsProvider>
     </ThemeProvider>
   );
 }

@@ -11,6 +11,7 @@ import SocketManager from '@/utils/socket';
 import { ExpoPushToken } from 'expo-notifications';
 import { useTheme } from '@/context/ThemeContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNotifications } from '@/context/NotificationsContext';
 
 interface BackendArticle {
   _id: string;
@@ -39,6 +40,7 @@ export default function NewsFeed() {
   const router = useRouter();
   const feedRef = useRef<FeedItemsHandle>(null);
   const { theme } = useTheme();
+  const { expoPushToken } = useNotifications();
   useEffect(() => {
     fetchArticles().then(() => {
       // After articles are loaded, scroll to initial article if provided
@@ -110,15 +112,15 @@ export default function NewsFeed() {
     };
     setArticles((prevArticles) => [transformedArticle, ...prevArticles]);
 
-    // Truncate heading and text for notification
-    const truncatedHeading =
-      newArticle.heading.length > 40
-        ? `${newArticle.heading.substring(0, 40)}...`
-        : newArticle.heading;
-
-    const truncatedText =
-      newArticle.text.length > 80 ? `${newArticle.text.substring(0, 80)}...` : newArticle.text;
-    sendLocalNotification(truncatedHeading, truncatedText, { articleId: newArticle._id });
+    // Show notification
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'New Article',
+        body: newArticle.heading,
+        data: { articleId: newArticle._id },
+      },
+      trigger: null, // null means show immediately
+    });
   }, []);
 
   const handleArticleUpdate = useCallback((updatedArticle: BackendArticle) => {
@@ -133,18 +135,15 @@ export default function NewsFeed() {
       };
 
       // Truncate heading and text for notification
-      const truncatedHeading =
-        updatedArticle.heading.length > 40
-          ? `${updatedArticle.heading.substring(0, 40)}...`
-          : updatedArticle.heading;
-
-      const truncatedText =
-        updatedArticle.text.length > 80
-          ? `${updatedArticle.text.substring(0, 80)}...`
-          : updatedArticle.text;
-
-      sendLocalNotification(truncatedHeading, truncatedText, { articleId: updatedArticle._id });
-
+      // Show notification
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'New Article',
+          body: updatedArticle.heading,
+          data: { articleId: updatedArticle._id },
+        },
+        trigger: null, // null means show immediately
+      });
       return [transformedArticle, ...filteredArticles];
     });
   }, []);
