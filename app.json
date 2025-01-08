@@ -44,7 +44,9 @@
         "backgroundColor": "#F7E5D4"
       }
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.buzuko.NewsBlitzs"
@@ -56,9 +58,16 @@
       },
       "package": "com.buzuko.NewsBlitzs",
       "icon": "./assets/icon.png",
-      "permissions": ["POST_NOTIFICATIONS"],
+      "permissions": [
+        "POST_NOTIFICATIONS"
+      ],
       "googleServicesFile": "./google-services.json",
       "useNextNotificationsApi": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9baf1359-8975-4b44-9af8-fd086b6b96b4"
+      }
     }
   }
 }
