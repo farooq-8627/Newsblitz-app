@@ -146,6 +146,17 @@ web-build/
 *.keystore
 !debug.keystore
 
+# Firebase config files
+google-services.json
+GoogleService-Info.plist
+
+# Other sensitive files
+*.keystore
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
 
 # Generated files
 ios/Pods/
