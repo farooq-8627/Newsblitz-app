@@ -47,16 +47,18 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.reelary.NewsBlitzs"
+      "bundleIdentifier": "com.buzuko.NewsBlitzs"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.reelary.NewsBlitzs",
+      "package": "com.buzuko.NewsBlitzs",
       "icon": "./assets/icon.png",
-      "permissions": ["POST_NOTIFICATIONS"]
+      "permissions": ["POST_NOTIFICATIONS"],
+      "googleServicesFile": "./google-services.json",
+      "useNextNotificationsApi": true
     }
   }
 }
