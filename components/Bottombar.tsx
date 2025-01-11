@@ -22,7 +22,9 @@ const BottomBar: React.FC<BottomBarProps> = ({
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const { theme } = useTheme();
   return (
-    <View className="w-full flex-row items-center justify-between border-t border-[#${borderColor}] bg-[#${bgColor}] px-4 py-4">
+    <View
+      className="w-full flex-row items-center justify-between border-t bg-[#${bgColor}] px-4 py-4"
+      style={{ borderColor: theme.borderColor }}>
       <View className="flex-row">
         <TouchableOpacity onPress={onBookmarkPress} className="mx-2">
           <Ionicons

@@ -85,7 +85,7 @@ export default function Search() {
         options={{
           title: 'Search Articles',
           headerStyle: { backgroundColor: theme.bgColor },
-          headerTintColor: theme.textColor,
+          headerTintColor: theme.headingColor,
         }}
       />
 

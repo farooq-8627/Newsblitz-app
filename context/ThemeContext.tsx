@@ -11,59 +11,32 @@ export const themes = {
     textColor: '#1F2937',
     headingColor: '#111827',
     timeTextColor: '#6B7280',
-    iconColor: '#4B5563',
-    borderColor: '#E5E7EB',
+    iconColor: '#000000',
+    borderColor: '#000000',
     cardBgColor: '#FFFFFF',
     cardBorderColor: '#E5E7EB',
+    switchTrackColor: '#767577',
+    switchThumbColor: '#f4f3f4',
+    switchIosBackground: '#3e3e3e',
+    buttonColor: '#3B82F6',
+    accentColor: '#2563EB',
   },
   dark: {
-    // Dark theme colors from your existing theme
-    bgColor: '#1F2937',
-    menuBgColor: '#111827',
-    menuSlideColor: 'rgba(0, 0, 0, 0.7)',
-    textColor: '#F3F4F6',
-    headingColor: '#FFFFFF',
-    timeTextColor: '#9CA3AF',
-    iconColor: '#D1D5DB',
-    borderColor: '#374151',
-    cardBgColor: '#374151',
-    cardBorderColor: '#4B5563',
-  },
-  sepia: {
-    bgColor: '#F7E5D4',
-    menuBgColor: '#F7E5D4',
-    menuSlideColor: 'rgba(74, 55, 40, 0.5)',
-    textColor: '#4A3728',
-    headingColor: '#2C1810',
-    timeTextColor: '#8B4513',
-    iconColor: '#8B4513',
-    borderColor: '#DEB887',
-    cardBgColor: '#FAF0E6',
-    cardBorderColor: '#DEB887',
-  },
-  night: {
-    bgColor: '#1A1B2E',
+    bgColor: '#1A1B2E', // Dark background
     menuBgColor: '#151626',
     menuSlideColor: 'rgba(0, 0, 0, 0.7)',
-    textColor: '#E2E8F0',
-    headingColor: '#FFFFFF',
-    timeTextColor: '#94A3B8',
-    iconColor: '#4F46E5',
-    borderColor: '#2D2E47',
-    cardBgColor: '#252642',
-    cardBorderColor: '#2D2E47',
-  },
-  forest: {
-    bgColor: '#E7F0E7',
-    menuBgColor: '#E7F0E7',
-    menuSlideColor: 'rgba(45, 59, 45, 0.5)',
-    textColor: '#2D3B2D',
-    headingColor: '#1C2B1C',
-    timeTextColor: '#3B824B',
-    iconColor: '#3B824B',
-    borderColor: '#A7C4A7',
-    cardBgColor: '#F0F7F0',
-    cardBorderColor: '#A7C4A7',
+    textColor: 'rgba(255, 255, 255, 0.9)', // Secondary text
+    headingColor: '#FFFFFF', // Primary text
+    timeTextColor: '#A8A8A8',
+    iconColor: '#2A9DF4', // Blue accent
+    borderColor: '#34495E', // Dim blue for dividers
+    cardBgColor: '#1E1F35',
+    cardBorderColor: '#2A9DF4',
+    accentColor: '#E1B12C', // Gold accent for highlights
+    buttonColor: '#3498DB', // Bright blue for buttons
+    switchTrackColor: '#3498DB',
+    switchThumbColor: '#2A9DF4',
+    switchIosBackground: '#3e3e3e',
   },
 };
 
@@ -75,54 +48,57 @@ interface ThemeContextType {
   setTheme: (theme: ThemeType) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType>({
+export const ThemeContext = createContext<ThemeContextType>({
   theme: themes.light,
   currentTheme: 'light',
   setTheme: () => {},
 });
 
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const systemColorScheme = useColorScheme();
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [currentTheme, setCurrentTheme] = useState<ThemeType>('light');
+  const systemColorScheme = useColorScheme();
 
   useEffect(() => {
-    // Load saved theme from AsyncStorage
-    const loadTheme = async () => {
-      try {
-        const savedTheme = await AsyncStorage.getItem('@theme');
-        if (savedTheme) {
-          setCurrentTheme(savedTheme as ThemeType);
-        } else {
-          // If no saved theme, use system preference
-          setCurrentTheme(systemColorScheme === 'dark' ? 'dark' : 'light');
-        }
-      } catch (error) {
-        console.error('Error loading theme:', error);
-      }
-    };
-
     loadTheme();
-  }, [systemColorScheme]);
+  }, []);
+
+  const loadTheme = async () => {
+    try {
+      const savedTheme = await AsyncStorage.getItem('@theme');
+      if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+        setCurrentTheme(savedTheme);
+      } else {
+        const defaultTheme = systemColorScheme === 'dark' ? 'dark' : 'light';
+        setCurrentTheme(defaultTheme);
+        await AsyncStorage.setItem('@theme', defaultTheme);
+      }
+    } catch (error) {
+      console.error('Failed to load theme:', error);
+    }
+  };
 
   const setTheme = async (newTheme: ThemeType) => {
     try {
       await AsyncStorage.setItem('@theme', newTheme);
       setCurrentTheme(newTheme);
     } catch (error) {
-      console.error('Error saving theme:', error);
+      console.error('Failed to save theme:', error);
     }
   };
 
-  return (
-    <ThemeContext.Provider
-      value={{
-        theme: themes[currentTheme],
-        currentTheme,
-        setTheme,
-      }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
+  const value = {
+    theme: themes[currentTheme],
+    currentTheme,
+    setTheme,
+  };
 
-export const useTheme = () => useContext(ThemeContext);
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+}
+
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
+};

@@ -11,7 +11,7 @@ import SocketManager from '@/utils/socket';
 import { ExpoPushToken } from 'expo-notifications';
 import { useTheme } from '@/context/ThemeContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useNotifications } from '@/context/NotificationsContext';
+import { usePushNotifications } from '@/context/usePushNotifications';
 
 interface BackendArticle {
   _id: string;
@@ -40,7 +40,10 @@ export default function NewsFeed() {
   const router = useRouter();
   const feedRef = useRef<FeedItemsHandle>(null);
   const { theme } = useTheme();
-  const { expoPushToken } = useNotifications();
+  const { expoPushToken, notification } = usePushNotifications();
+
+  const data = JSON.stringify(notification,undefined,2);
+
   useEffect(() => {
     fetchArticles().then(() => {
       // After articles are loaded, scroll to initial article if provided
@@ -160,6 +163,18 @@ export default function NewsFeed() {
     socket.on('articleUpdated', handleArticleUpdate);
     socket.on('articleDeleted', handleArticleDelete);
 
+    // Initial fetch
+    fetchArticles();
+
+    return () => {
+      socket.off('newArticle', handleNewArticle);
+      socket.off('articleUpdated', handleArticleUpdate);
+      socket.off('articleDeleted', handleArticleDelete);
+    };
+  }, [handleNewArticle, handleArticleUpdate, handleArticleDelete, articles]); // Socket-related dependencies
+
+  // Separate useEffect for notification listeners
+  useEffect(() => {
     // Push notification setup
     registerForPushNotificationsAsync().then((token: ExpoPushToken | undefined) => {
       if (token) {
@@ -167,14 +182,12 @@ export default function NewsFeed() {
       }
     });
 
-    // Notification listeners
     notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
       console.log('Notification received:', notification);
     });
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
       const articleId = response.notification.request.content.data?.articleId;
-
       if (articleId) {
         const articleIndex = articles.findIndex((article) => article.id === articleId);
         if (articleIndex !== -1) {
@@ -185,16 +198,7 @@ export default function NewsFeed() {
       }
     });
 
-    // Initial fetch
-    fetchArticles();
-
     return () => {
-      // Cleanup socket listeners
-      socket.off('newArticle', handleNewArticle);
-      socket.off('articleUpdated', handleArticleUpdate);
-      socket.off('articleDeleted', handleArticleDelete);
-
-      // Cleanup notification listeners
       if (notificationListener.current) {
         Notifications.removeNotificationSubscription(notificationListener.current);
       }
@@ -202,7 +206,7 @@ export default function NewsFeed() {
         Notifications.removeNotificationSubscription(responseListener.current);
       }
     };
-  }, [articles, router]);
+  }, []);
 
   if (loading) {
     return (

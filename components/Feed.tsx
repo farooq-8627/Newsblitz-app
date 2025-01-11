@@ -148,7 +148,7 @@ const Feed = forwardRef<FeedHandle, FeedProps>(
           <View style={{ flex: 5, padding: 16 }}>
             <Text
               style={{
-                fontSize: 24,
+                fontSize: 22,
                 fontWeight: 'bold',
                 marginBottom: 8,
                 color: `${theme.headingColor}`,

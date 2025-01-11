@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "NewsBlitzs",
+    "name": "Blitzs",
     "slug": "NewsBlitzs",
     "version": "1.0.0",
     "newArchEnabled": true,
@@ -28,20 +28,14 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FFFFFF",
+      "light": {
+        "image": "./assets/splash.png",
+        "backgroundColor": "#FFFFFF"
+      },
       "dark": {
-        "backgroundColor": "#1F2937"
-      },
-      "forest": {
-        "backgroundColor": "#E7F0E7"
-      },
-      "night": {
+        "image": "./assets/splash.png",
         "backgroundColor": "#1A1B2E"
-      },
-      "sepia": {
-        "backgroundColor": "#F7E5D4"
       }
     },
     "assetBundlePatterns": [
@@ -58,15 +52,17 @@
       },
       "package": "com.buzuko.NewsBlitzs",
       "icon": "./assets/icon.png",
+      "googleServicesFile": "./android/app/google-services.json",
       "permissions": [
         "POST_NOTIFICATIONS"
-      ],
-      "googleServicesFile": "./google-services.json",
-      "useNextNotificationsApi": true
+      ]
     },
     "extra": {
+      "router": {
+        "origin": false
+      },
       "eas": {
-        "projectId": "9baf1359-8975-4b44-9af8-fd086b6b96b4"
+        "projectId": "41bc6806-d3d6-479b-9253-0ba6c33f719a"
       }
     }
   }
