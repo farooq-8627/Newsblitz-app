@@ -15,7 +15,10 @@ expo-env.d.ts
 
 
 ios
-android
+android/*
+!android/app
+android/app/*
+!android/app/google-services.json
 
 # macOS
 .DS_Store
@@ -146,9 +149,6 @@ web-build/
 *.keystore
 !debug.keystore
 
-# Firebase config files
-google-services.json
-GoogleService-Info.plist
 
 # Other sensitive files
 *.keystore
