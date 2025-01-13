@@ -42,7 +42,7 @@ export default function NewsFeed() {
   const { theme } = useTheme();
   const { expoPushToken, notification } = usePushNotifications();
 
-  const data = JSON.stringify(notification,undefined,2);
+  const data = JSON.stringify(notification, undefined, 2);
 
   useEffect(() => {
     fetchArticles().then(() => {
@@ -115,14 +115,32 @@ export default function NewsFeed() {
     };
     setArticles((prevArticles) => [transformedArticle, ...prevArticles]);
 
-    // Show notification
+    // Prepare notification content
+    const truncatedText =
+      newArticle.text.length > 100 ? `${newArticle.text.substring(0, 100)}...` : newArticle.text;
+
+    // Schedule notification with image
     Notifications.scheduleNotificationAsync({
       content: {
         title: 'New Article',
-        body: newArticle.heading,
-        data: { articleId: newArticle._id },
+        subtitle: newArticle.heading,
+        body: truncatedText,
+        data: {
+          articleId: newArticle._id,
+          imageUrl: newArticle.imageLink,
+        },
+        attachments: [
+          {
+            identifier: 'article-image',
+            url: newArticle.imageLink,
+            type: 'image',
+          },
+        ],
+        sound: 'default',
+        priority: Notifications.AndroidNotificationPriority.HIGH,
+        badge: 1,
       },
-      trigger: null, // null means show immediately
+      trigger: null,
     });
   }, []);
 
@@ -137,15 +155,34 @@ export default function NewsFeed() {
         updatedAt: updatedArticle.uploadedAt,
       };
 
-      // Truncate heading and text for notification
-      // Show notification
+      // Prepare notification content
+      const truncatedText =
+        updatedArticle.text.length > 100
+          ? `${updatedArticle.text.substring(0, 100)}...`
+          : updatedArticle.text;
+
+      // Schedule notification with image
       Notifications.scheduleNotificationAsync({
         content: {
-          title: 'New Article',
-          body: updatedArticle.heading,
-          data: { articleId: updatedArticle._id },
+          title: 'Article Updated',
+          subtitle: updatedArticle.heading,
+          body: truncatedText,
+          data: {
+            articleId: updatedArticle._id,
+            imageUrl: updatedArticle.imageLink,
+          },
+          attachments: [
+            {
+              identifier: 'article-image',
+              url: updatedArticle.imageLink,
+              type: 'image',
+            },
+          ],
+          sound: 'default',
+          priority: Notifications.AndroidNotificationPriority.HIGH,
+          badge: 1,
         },
-        trigger: null, // null means show immediately
+        trigger: null,
       });
       return [transformedArticle, ...filteredArticles];
     });
@@ -174,19 +211,46 @@ export default function NewsFeed() {
   }, [handleNewArticle, handleArticleUpdate, handleArticleDelete, articles]); // Socket-related dependencies
 
   // Separate useEffect for notification listeners
+  // useEffect(() => {
+  //   // Push notification setup
+  //   registerForPushNotificationsAsync().then((token: ExpoPushToken | undefined) => {
+  //     if (token) {
+  //       console.log('Expo push token:', token);
+  //     }
+  //   });
+
+  //   // Handle received notifications
+  //   notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
+  //     console.log('Notification received:', notification);
+  //   });
+
+  //   // Handle notification clicks
+  //   responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+  //     const articleId = response.notification.request.content.data?.articleId;
+  //     if (articleId) {
+  //       setTimeout(() => {
+  //         const articleIndex = articles.findIndex((article) => article.id === articleId);
+  //         if (articleIndex !== -1) {
+  //           feedRef.current?.scrollToIndex(articleIndex);
+  //         } else {
+  //           router.push(`/article/${articleId}`);
+  //         }
+  //       }, 100);
+  //     }
+  //   });
+
+  //   return () => {
+  //     if (notificationListener.current) {
+  //       Notifications.removeNotificationSubscription(notificationListener.current);
+  //     }
+  //     if (responseListener.current) {
+  //       Notifications.removeNotificationSubscription(responseListener.current);
+  //     }
+  //   };
+  // }, [articles,router]);
+
   useEffect(() => {
-    // Push notification setup
-    registerForPushNotificationsAsync().then((token: ExpoPushToken | undefined) => {
-      if (token) {
-        console.log('Expo push token:', token);
-      }
-    });
-
-    notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
-      console.log('Notification received:', notification);
-    });
-
-    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
       const articleId = response.notification.request.content.data?.articleId;
       if (articleId) {
         const articleIndex = articles.findIndex((article) => article.id === articleId);
@@ -199,14 +263,9 @@ export default function NewsFeed() {
     });
 
     return () => {
-      if (notificationListener.current) {
-        Notifications.removeNotificationSubscription(notificationListener.current);
-      }
-      if (responseListener.current) {
-        Notifications.removeNotificationSubscription(responseListener.current);
-      }
+      subscription.remove();
     };
-  }, []);
+  }, [articles, router]);
 
   if (loading) {
     return (

@@ -1,16 +1,38 @@
 import '../global.css';
-import { Stack } from 'expo-router';
 import { BookmarksProvider } from '@/context/BookmarksContext';
-import Toast, { BaseToast, ErrorToast, ToastProps } from 'react-native-toast-message';
-import { StatusBar } from 'react-native';
-import { MotiView } from 'moti';
 import { ThemeProvider } from '@/context/ThemeContext';
-import { View } from 'react-native';
-
-// Separate the RootLayout into its own component file
+import { SplashScreen } from 'expo-router';
 import RootLayoutContent from '@/components/RootLayoutContent';
+import { useEffect } from 'react';
+import {
+  useFonts,
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+} from '@expo-google-fonts/poppins';
 
+SplashScreen.preventAutoHideAsync();
 export default function Layout() {
+  const [fontsLoaded, fontError] = useFonts({
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      setTimeout(() => {
+        SplashScreen.hideAsync();
+      }, 1000);
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <ThemeProvider>
       <BookmarksProvider>
