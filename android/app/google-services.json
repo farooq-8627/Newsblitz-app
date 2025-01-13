@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "122635997047",
-    "project_id": "newsblitzs",
-    "storage_bucket": "newsblitzs.firebasestorage.app"
+    "project_number": "447088520134",
+    "project_id": "blitzs-200b8",
+    "storage_bucket": "blitzs-200b8.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:122635997047:android:9f90adc72d6aa99677db72",
+        "mobilesdk_app_id": "1:447088520134:android:007e26b8133fb7f483e0c7",
         "android_client_info": {
-          "package_name": "com.buzuko.NewsBlitzs"
+          "package_name": "com.blitzs.blitzs"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA6RfXF_PtpbfytA8gcEhSzG478-wfmQMg"
+          "current_key": "AIzaSyDGak7EM7dZMjX4wkN0K57nO4cW5GMeKAI"
         }
       ],
       "services": {
