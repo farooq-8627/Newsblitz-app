@@ -36,11 +36,13 @@
       "image": "./assets/splash.png",
       "backgroundColor": "#FFFFFF",
       "dark": {
-        "image": "./assets/splash.png",
+        "image": "./assets/splash-dark.png",
         "backgroundColor": "#1A1B2E"
       }
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.blitzs.blitzs"
@@ -50,18 +52,32 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
+      "versionCode": 1,
       "package": "com.blitzs.blitzs",
       "icon": "./assets/icon.png",
       "googleServicesFile": "./android/app/google-services.json",
-      "permissions": ["POST_NOTIFICATIONS"]
+      "permissions": [
+        "POST_NOTIFICATIONS"
+      ],
+      "splash": {
+        "image": "./assets/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#FFFFFF",
+        "dark": {
+          "image": "./assets/splash-dark.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#1A1B2E"
+        }
+      }
     },
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "fb6c44c0-1def-49f4-b6c3-5ca5060b217d"
+        "projectId": "2db169bb-8c7f-4bc3-b72e-851ded92a12b"
       }
-    }
+    },
+    "owner": "blitzs"
   }
 }

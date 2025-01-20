@@ -10,16 +10,8 @@ export interface PushNotificationState {
 }
 
 export const usePushNotifications = () => {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-      shouldShowAlert: true,
-    }),
-  });
   const [expoPushToken, setExpoPushToken] = useState<Notifications.ExpoPushToken | undefined>();
   const [notification, setNotification] = useState<Notifications.Notification | undefined>();
-
   const notificationListener = useRef<Notifications.Subscription>();
   const responseListener = useRef<Notifications.Subscription>();
 
@@ -54,38 +46,53 @@ export const usePushNotifications = () => {
     }
   }
 
-  // useEffect(() => {
-  //   registerForPushNotificationsAsync().then((token) => setExpoPushToken(token));
-
-  //   notificationListener.current = Notifications.addNotificationReceivedListener((notification) =>
-  //     setNotification(notification)
-  //   );
-  //   responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-  //     console.log(response);
-  //   });
-
-  //   return () => {
-  //     Notifications.removeNotificationSubscription(notificationListener.current!);
-  //     Notifications.removeNotificationSubscription(responseListener.current!);
-  //   };
-  // }, []);
-
   useEffect(() => {
     let isMounted = true;
 
     const setupNotifications = async () => {
-      const token = await registerForPushNotificationsAsync();
-      if (isMounted && token) {
-        setExpoPushToken(token);
+      try {
+        console.log('Setting up push notifications...');
+        const token = await registerForPushNotificationsAsync();
+        
+        if (isMounted && token) {
+          console.log('Expo Push Token:', token.data);
+          setExpoPushToken(token);
+          
+          // Set up background notification handler
+          await Notifications.setNotificationChannelAsync('default', {
+            name: 'default',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+            lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+            bypassDnd: true,
+          });
+        }
+      } catch (error) {
+        console.error('Error setting up notifications:', error);
       }
     };
 
     setupNotifications();
 
-    notificationListener.current = Notifications.addNotificationReceivedListener(setNotification);
-    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log('Notification response:', response);
-    });
+    // Handle received notifications
+    notificationListener.current = Notifications.addNotificationReceivedListener(
+      notification => {
+        console.log('\n=== Notification Received ===');
+    console.log('Title:', notification.request.content.title);
+    console.log('Body:', notification.request.content.body);
+    console.log('Data:', notification.request.content.data);
+        console.log('Notification received in foreground:', notification);
+        setNotification(notification);
+      }
+    );
+
+    // Handle notification responses
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(
+      response => {
+        console.log('Notification response received:', response);
+      }
+    );
 
     return () => {
       isMounted = false;
@@ -98,5 +105,5 @@ export const usePushNotifications = () => {
     };
   }, []);
 
-  return { notification, expoPushToken };
+  return { expoPushToken, notification };
 };

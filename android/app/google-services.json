@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "897659250778",
-    "project_id": "blitzs-a68f6",
-    "storage_bucket": "blitzs-a68f6.firebasestorage.app"
+    "project_number": "447088520134",
+    "project_id": "blitzs-200b8",
+    "storage_bucket": "blitzs-200b8.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:897659250778:android:7085e37079e8f0eca55063",
+        "mobilesdk_app_id": "1:447088520134:android:007e26b8133fb7f483e0c7",
         "android_client_info": {
           "package_name": "com.blitzs.blitzs"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAZvEsl9hsGofBslm5bGnfjpI0_nczt5_c"
+          "current_key": "AIzaSyDGak7EM7dZMjX4wkN0K57nO4cW5GMeKAI"
         }
       ],
       "services": {

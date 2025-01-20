@@ -103,7 +103,36 @@ export default function NewsFeed() {
       setRefreshing(false);
     }
   }, []);
+ 
+  const sendNotification = async (article: BackendArticle) => {
+    const truncatedText = article.text.length > 100 
+      ? `${article.text.substring(0, 100)}...` 
+      : article.text;
 
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'New Article Added',
+        subtitle: article.heading,
+        body: truncatedText,
+        data: {
+          articleId: article._id,
+          imageUrl: article.imageLink,
+        },
+        attachments: [
+          {
+            identifier: 'article-image',
+            url: article.imageLink,
+            type: 'image',
+          },
+        ],
+        sound: 'default',
+        priority: Notifications.AndroidNotificationPriority.HIGH,
+        badge: 1,
+      },
+      trigger: null,
+    });
+  };
+  
   const handleNewArticle = useCallback((newArticle: BackendArticle) => {
     console.log('Received new article:', newArticle);
     const transformedArticle: Article = {
@@ -114,39 +143,15 @@ export default function NewsFeed() {
       updatedAt: newArticle.uploadedAt,
     };
     setArticles((prevArticles) => [transformedArticle, ...prevArticles]);
-
-    // Prepare notification content
-    const truncatedText =
-      newArticle.text.length > 100 ? `${newArticle.text.substring(0, 100)}...` : newArticle.text;
-
-    // Schedule notification with image
-    Notifications.scheduleNotificationAsync({
-      content: {
-        title: 'New Article',
-        subtitle: newArticle.heading,
-        body: truncatedText,
-        data: {
-          articleId: newArticle._id,
-          imageUrl: newArticle.imageLink,
-        },
-        attachments: [
-          {
-            identifier: 'article-image',
-            url: newArticle.imageLink,
-            type: 'image',
-          },
-        ],
-        sound: 'default',
-        priority: Notifications.AndroidNotificationPriority.HIGH,
-        badge: 1,
-      },
-      trigger: null,
-    });
+    sendNotification(newArticle);
   }, []);
 
   const handleArticleUpdate = useCallback((updatedArticle: BackendArticle) => {
+    console.log('Handling article update:', updatedArticle);
     setArticles((prevArticles) => {
-      const filteredArticles = prevArticles.filter((article) => article.id !== updatedArticle._id);
+      const filteredArticles = prevArticles.filter(
+        (article) => article.id !== updatedArticle._id
+      );
       const transformedArticle: Article = {
         id: updatedArticle._id,
         imageUri: updatedArticle.imageLink,
@@ -155,13 +160,11 @@ export default function NewsFeed() {
         updatedAt: updatedArticle.uploadedAt,
       };
 
-      // Prepare notification content
-      const truncatedText =
-        updatedArticle.text.length > 100
-          ? `${updatedArticle.text.substring(0, 100)}...`
-          : updatedArticle.text;
+      // Send local notification for update
+      const truncatedText = updatedArticle.text.length > 100 
+        ? `${updatedArticle.text.substring(0, 100)}...` 
+        : updatedArticle.text;
 
-      // Schedule notification with image
       Notifications.scheduleNotificationAsync({
         content: {
           title: 'Article Updated',
@@ -170,20 +173,14 @@ export default function NewsFeed() {
           data: {
             articleId: updatedArticle._id,
             imageUrl: updatedArticle.imageLink,
+            type: 'update'
           },
-          attachments: [
-            {
-              identifier: 'article-image',
-              url: updatedArticle.imageLink,
-              type: 'image',
-            },
-          ],
           sound: 'default',
           priority: Notifications.AndroidNotificationPriority.HIGH,
-          badge: 1,
         },
         trigger: null,
       });
+
       return [transformedArticle, ...filteredArticles];
     });
   }, []);
@@ -191,6 +188,7 @@ export default function NewsFeed() {
   const handleArticleDelete = useCallback((deletedId: string) => {
     setArticles((prevArticles) => prevArticles.filter((article) => article.id !== deletedId));
   }, []);
+
 
   useEffect(() => {
     const socket = SocketManager.getSocket();
@@ -210,53 +208,18 @@ export default function NewsFeed() {
     };
   }, [handleNewArticle, handleArticleUpdate, handleArticleDelete, articles]); // Socket-related dependencies
 
-  // Separate useEffect for notification listeners
-  // useEffect(() => {
-  //   // Push notification setup
-  //   registerForPushNotificationsAsync().then((token: ExpoPushToken | undefined) => {
-  //     if (token) {
-  //       console.log('Expo push token:', token);
-  //     }
-  //   });
-
-  //   // Handle received notifications
-  //   notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
-  //     console.log('Notification received:', notification);
-  //   });
-
-  //   // Handle notification clicks
-  //   responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-  //     const articleId = response.notification.request.content.data?.articleId;
-  //     if (articleId) {
-  //       setTimeout(() => {
-  //         const articleIndex = articles.findIndex((article) => article.id === articleId);
-  //         if (articleIndex !== -1) {
-  //           feedRef.current?.scrollToIndex(articleIndex);
-  //         } else {
-  //           router.push(`/article/${articleId}`);
-  //         }
-  //       }, 100);
-  //     }
-  //   });
-
-  //   return () => {
-  //     if (notificationListener.current) {
-  //       Notifications.removeNotificationSubscription(notificationListener.current);
-  //     }
-  //     if (responseListener.current) {
-  //       Notifications.removeNotificationSubscription(responseListener.current);
-  //     }
-  //   };
-  // }, [articles,router]);
-
   useEffect(() => {
-    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('Notification clicked:', response);
       const articleId = response.notification.request.content.data?.articleId;
       if (articleId) {
-        const articleIndex = articles.findIndex((article) => article.id === articleId);
+        console.log('Navigating to article:', articleId);
+        const articleIndex = articles.findIndex(article => article.id === articleId);
         if (articleIndex !== -1) {
+          console.log('Article found in current list, scrolling to index:', articleIndex);
           feedRef.current?.scrollToIndex(articleIndex);
         } else {
+          console.log('Article not found in current list, navigating to article page');
           router.push(`/article/${articleId}`);
         }
       }
